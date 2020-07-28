@@ -81,7 +81,7 @@ class ImageGPT(pl.LightningModule):
         x, y = batch
         x = _shape_input(x)
         
-        print('x shape in training is:', x.size(), 'y shape in training is:', y.size())
+#         print('x shape in training is:', x.size(), 'y shape in training is:', y.size())
         #####（784，64） （64）
         if self.hparams.classify:
             clf_logits = self.gpt(x, classify=True)
