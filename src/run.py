@@ -69,6 +69,4 @@ if __name__ == "__main__":
     parser_test.set_defaults(func=test)
 
     args = parser.parse_args()
-    '''
     args.func(args)
-    '''
