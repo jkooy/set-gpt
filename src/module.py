@@ -3,9 +3,28 @@ import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader, random_split
 import pytorch_lightning as pl
 import numpy as np
+import logging
 from argparse import ArgumentParser
 
 from gpt2 import GPT2
+
+
+def get_logger(file_path):
+    """ Make python logger """
+    # [!] Since tensorboardX use default logger (e.g. logging.info()), we should use custom logger
+    logger = logging.getLogger('darts')
+    log_format = '%(asctime)s | %(message)s'
+    formatter = logging.Formatter(log_format, datefmt='%m/%d %I:%M:%S %p')
+    file_handler = logging.FileHandler(file_path)
+    file_handler.setFormatter(formatter)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+
+    logger.addHandler(file_handler)
+    logger.addHandler(stream_handler)
+    logger.setLevel(logging.INFO)
+
+    return logger
 
 
 def _shape_input(x):
@@ -29,7 +48,7 @@ class ImageGPT(pl.LightningModule):
         )
 
         self.criterion = nn.CrossEntropyLoss()
-
+        
     @staticmethod
     def add_model_specific_args(parent_parser):
         parser = ArgumentParser(parents=[parent_parser], add_help=False)
@@ -61,7 +80,8 @@ class ImageGPT(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         x, y = batch
         x = _shape_input(x)
-
+        
+        print('x shape in training is:', x.size(), 'y shape in training is:', y.size())
         if self.hparams.classify:
             clf_logits = self.gpt(x, classify=True)
             loss = self.criterion(clf_logits, y)
