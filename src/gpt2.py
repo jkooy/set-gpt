@@ -1,6 +1,29 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import logging
+import os
+import numpy as np
+
+def get_logger(file_path):
+    """ Make python logger """
+    # [!] Since tensorboardX use default logger (e.g. logging.info()), we should use custom logger
+    logger = logging.getLogger('/set')
+    log_format = '%(asctime)s | %(message)s'
+    formatter = logging.Formatter(log_format, datefmt='%m/%d %I:%M:%S %p')
+    file_handler = logging.FileHandler(file_path)
+    file_handler.setFormatter(formatter)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+
+    logger.addHandler(file_handler)
+    logger.addHandler(stream_handler)
+    logger.setLevel(logging.INFO)
+
+    return logger
+
+logger = get_logger(os.path.join('', "{}.log".format(set)))
+
 
 
 class Block(nn.Module):
@@ -58,7 +81,8 @@ class GPT2(nn.Module):
         length, batch = x.shape
 
         h = self.token_embeddings(x)
-
+        logger.info("reshape train h size is {}".format(np.shape(h))) 
+        
         # prepend sos token
         sos = torch.ones(1, batch, self.embed_dim, device=x.device) * self.sos
         h = torch.cat([sos, h[:-1, :, :]], axis=0)

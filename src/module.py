@@ -4,9 +4,29 @@ from torch.utils.data import TensorDataset, DataLoader, random_split
 import pytorch_lightning as pl
 import numpy as np
 from argparse import ArgumentParser
+import logging
+import os
 
 from gpt2 import GPT2
 
+def get_logger(file_path):
+    """ Make python logger """
+    # [!] Since tensorboardX use default logger (e.g. logging.info()), we should use custom logger
+    logger = logging.getLogger('/set')
+    log_format = '%(asctime)s | %(message)s'
+    formatter = logging.Formatter(log_format, datefmt='%m/%d %I:%M:%S %p')
+    file_handler = logging.FileHandler(file_path)
+    file_handler.setFormatter(formatter)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+
+    logger.addHandler(file_handler)
+    logger.addHandler(stream_handler)
+    logger.setLevel(logging.INFO)
+
+    return logger
+
+logger = get_logger(os.path.join('', "{}.log".format(set)))
 
 def _shape_input(x):
     """shape batch of images for input into GPT2 model"""
@@ -60,13 +80,16 @@ class ImageGPT(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, y = batch
+        logger.info("reshape train x,y size is {}{}".format(np.shape(x), np.shape(y))) 
         x = _shape_input(x)
-
+        
         if self.hparams.classify:
             clf_logits = self.gpt(x, classify=True)
             loss = self.criterion(clf_logits, y)
         else:
             logits = self.gpt(x)
+            logger.info("reshape train y size is {}".format(np.shape(logits.view(-1, logits.size(-1)))))          
+            logger.info("reshape train x size is {}".format(np.shape(x.view(-1))))
             loss = self.criterion(logits.view(-1, logits.size(-1)), x.view(-1))
 
         logs = {"loss": loss}
@@ -112,9 +135,13 @@ class ImageGPT(pl.LightningModule):
         ds = lambda x, y: TensorDataset(torch.from_numpy(x), torch.from_numpy(y))
 
         train_x = np.load(self.hparams.train_x)
+        logger.info("train x size is {}".format(np.shape(train_x)))
         train_y = np.load(self.hparams.train_y)
+        logger.info("train y size is {}".format(np.shape(train_x)))
         test_x = np.load(self.hparams.test_x)
+        logger.info("test x size is {}".format(np.shape(train_x)))
         test_y = np.load(self.hparams.test_y)
+        logger.info("test y size is {}".format(np.shape(train_x)))
 
         train_ds = ds(train_x, train_y)
         train_size = int(0.9 * len(train_ds))
