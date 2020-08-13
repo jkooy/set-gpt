@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader, random_split
 import pytorch_lightning as pl
 import numpy as np
+import logging
 from argparse import ArgumentParser
 import logging
 import os
@@ -28,6 +29,24 @@ def get_logger(file_path):
 
 logger = get_logger(os.path.join('', "{}.log".format(set)))
 
+def get_logger(file_path):
+    """ Make python logger """
+    # [!] Since tensorboardX use default logger (e.g. logging.info()), we should use custom logger
+    logger = logging.getLogger('darts')
+    log_format = '%(asctime)s | %(message)s'
+    formatter = logging.Formatter(log_format, datefmt='%m/%d %I:%M:%S %p')
+    file_handler = logging.FileHandler(file_path)
+    file_handler.setFormatter(formatter)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+
+    logger.addHandler(file_handler)
+    logger.addHandler(stream_handler)
+    logger.setLevel(logging.INFO)
+
+    return logger
+
+
 def _shape_input(x):
     """shape batch of images for input into GPT2 model"""
     x = x.view(x.shape[0], -1)  # flatten images into sequences
@@ -49,7 +68,7 @@ class ImageGPT(pl.LightningModule):
         )
 
         self.criterion = nn.CrossEntropyLoss()
-
+        
     @staticmethod
     def add_model_specific_args(parent_parser):
         parser = ArgumentParser(parents=[parent_parser], add_help=False)
@@ -83,6 +102,11 @@ class ImageGPT(pl.LightningModule):
         logger.info("reshape train x,y size is {}{}".format(np.shape(x), np.shape(y))) 
         x = _shape_input(x)
         
+<<<<<<< HEAD
+=======
+#         print('x shape in training is:', x.size(), 'y shape in training is:', y.size())
+        #####（784，64） （64）
+>>>>>>> 6979c31f24738fbc5ef44971a92de63c97f7aee7
         if self.hparams.classify:
             clf_logits = self.gpt(x, classify=True)
             loss = self.criterion(clf_logits, y)
