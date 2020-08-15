@@ -79,9 +79,10 @@ class GPT2(nn.Module):
         If classify, return classification logits
         """
         length, batch = x.shape
-
+        
+        logger.info("input x size is {}".format(np.shape(x))) 
         h = self.token_embeddings(x)
-        logger.info("reshape train h size is {}".format(np.shape(h))) 
+        logger.info("h after embedding size is {}".format(np.shape(h))) 
         
         # prepend sos token
         sos = torch.ones(1, batch, self.embed_dim, device=x.device) * self.sos
@@ -97,6 +98,7 @@ class GPT2(nn.Module):
 
         if not classify:
             # return logits
+            print('h',self.head(h).size())
             return self.head(h)
 
         h = torch.mean(h, dim=0)  # average pool over sequence

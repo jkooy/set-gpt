@@ -99,14 +99,11 @@ class ImageGPT(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-        logger.info("reshape train x,y size is {}{}".format(np.shape(x), np.shape(y))) 
+#         logger.info("reshape train x,y size is {}{}".format(np.shape(x), np.shape(y))) 
         x = _shape_input(x)
         
-<<<<<<< HEAD
-=======
 #         print('x shape in training is:', x.size(), 'y shape in training is:', y.size())
         #####（784，64） （64）
->>>>>>> 6979c31f24738fbc5ef44971a92de63c97f7aee7
         if self.hparams.classify:
             clf_logits = self.gpt(x, classify=True)
             loss = self.criterion(clf_logits, y)
@@ -159,13 +156,13 @@ class ImageGPT(pl.LightningModule):
         ds = lambda x, y: TensorDataset(torch.from_numpy(x), torch.from_numpy(y))
 
         train_x = np.load(self.hparams.train_x)
-        logger.info("train x size is {}".format(np.shape(train_x)))
+#         logger.info("train x size is {}".format(np.shape(train_x)))
         train_y = np.load(self.hparams.train_y)
-        logger.info("train y size is {}".format(np.shape(train_x)))
+#         logger.info("train y size is {}".format(np.shape(train_x)))
         test_x = np.load(self.hparams.test_x)
-        logger.info("test x size is {}".format(np.shape(train_x)))
+#         logger.info("test x size is {}".format(np.shape(train_x)))
         test_y = np.load(self.hparams.test_y)
-        logger.info("test y size is {}".format(np.shape(train_x)))
+#         logger.info("test y size is {}".format(np.shape(train_x)))
 
         train_ds = ds(train_x, train_y)
         train_size = int(0.9 * len(train_ds))

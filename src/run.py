@@ -58,7 +58,7 @@ if __name__ == "__main__":
     parser.add_argument("--test_y", default="data/test_y.npy")
 
     parser.add_argument("--gpus", default="0")
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers() 
     parser_train = subparsers.add_parser("train")
     parser_train.add_argument("--pretrained", type=str, default=None)
     parser_train.add_argument("-n", "--name", type=str, required=True)
