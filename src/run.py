@@ -23,7 +23,7 @@ def train(args):
         trainer = pl.Trainer(
             max_steps=args.steps,
             gpus=args.gpus,
-            early_stopping_callback=early_stopping,
+#             early_stopping_callback=early_stopping,
             checkpoint_callback=checkpoint,
             logger=logger,
         )
